@@ -1,19 +1,19 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.io.IOException;
+
+import java.lang.ClassNotFoundException;
+import java.lang.IllegalAccessException;
+import java.lang.InstantiationException;
 
 import java.net.URI;
 
@@ -25,13 +25,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 // class to be used whenever a GUI is required or wanted
 public class GUI {
 	
-	class OpenURI implements ActionListener { // for traveling to links upon clicking them (possible with JButton, possible for anything that can have an action listener? I feel like the answer is yes...)
+	class OpenURI implements ActionListener { // for traveling to links upon clicking them
 		
 		URI uri;
 		
@@ -57,17 +58,15 @@ public class GUI {
 		}
 	}
 	
-	public GUI() {}
-	
-	// final ImageIcon icon = new ImageIcon("C:\\Users\\NickBej\\Pictures\\superSmileIcon(Rainbow-Machine).jpg");
+	public GUI() {
+		setLookAndFeel();
+	}
 	
 	Dimension screensize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 	
 	Font GUIFont = new Font("Book Antiqua", Font.PLAIN, 20);
 	
 	String htmlTab = "&nbsp;&nbsp;&nbsp;";
-	
-	//String htmlFont = "<html><font name = 'Book Antiqua' size = '4'>";
 	
 	public GUI (String[] buttons) {
 		JFrame fullscreenFrame = new JFrame();
@@ -77,42 +76,53 @@ public class GUI {
 	public int displayOptions (String heading, String[] options) {
 		JComboBox<String> listOfOptions = new JComboBox<String>(options);
 		listOfOptions.setFont(GUIFont);
-		JOptionPane.showMessageDialog(null, listOfOptions, heading, 1);
+		JFrame displayOptionsFrame = new JFrame();
+		JOptionPane.showMessageDialog(displayOptionsFrame, listOfOptions, heading, JOptionPane.INFORMATION_MESSAGE);
 		return listOfOptions.getSelectedIndex();
 	}
 	
 	public String get (String query) {
 		query = tabAndNewlineTranslator(query);
-		JLabel vessel = new JLabel(query);
+		JLabel vessel = new JLabel(query, SwingConstants.CENTER);
 		vessel.setFont(GUIFont);
 		JFrame inputFrame = new JFrame();
-		return JOptionPane.showInputDialog(inputFrame, vessel);
+		return JOptionPane.showInputDialog(inputFrame, vessel, "Input", JOptionPane.QUESTION_MESSAGE);
 	}
 	
-	public Font getFont() { // accesses "font" in the class "GUI"
+	public Font getFont() {
 		return GUIFont;
 	}
 	
-	public Dimension getScreensize() { // accesses the dimension "screensize" in the class "GUI"
+	public Dimension getScreensize() {
 		return screensize;
 	}
 	
 	public void give (String message) {
 		message = tabAndNewlineTranslator(message);
-		JLabel vessel = new JLabel(message);
+		JLabel vessel = new JLabel(message, SwingConstants.CENTER);
 		vessel.setFont(GUIFont);
 		JFrame outputFrame = new JFrame();
-		JOptionPane.showMessageDialog(outputFrame, vessel, "Message", 1, UIManager.getIcon("OptionPane.informationIcon"));
+		JOptionPane.showMessageDialog(outputFrame, vessel, "Message", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.informationIcon"));
 	}
 	
-	public JFrame giveTextArea (String message, int xCoordinate, int yCoordinate) {
-		Dimension frameOutline = new Dimension(getScreensize().width, getScreensize().height / 3);
+	public void giveThrowable (Throwable gah) {
+		String gahDescriptionAndMessage = "Short Description - " + gah.toString() + "\n\n"
+										+ "Detail Message String - " + ((gah.getMessage() != null) ? (gah.getMessage()) : ("(No detail message string)")); // if getMessage() doesn't return null, show its return; else, show custom text
+		gahDescriptionAndMessage = tabAndNewlineTranslator(gahDescriptionAndMessage);
+		JLabel vessel = new JLabel(gahDescriptionAndMessage, SwingConstants.CENTER);
+		vessel.setFont(GUIFont);
+		JFrame outputFrame = new JFrame();
+		String[] option = {"Continue"};
+		JOptionPane.showOptionDialog(outputFrame, vessel, "Warning!", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), option, 0);
+	}
+	
+	public JFrame giveTextArea (String message, int xCoordinate, int yCoordinate, int fractionOfWidth, int fractionOfHeight) {
+		Dimension frameOutline = new Dimension(getScreensize().width / fractionOfWidth, getScreensize().height / fractionOfHeight); // what fraction of the display should this text area take up
 		JTextArea txtAr = new JTextArea();
 		JScrollPane scrllPn = new JScrollPane(txtAr);
 		txtAr.setEditable(false);
 		txtAr.append(message);
-		Font fnt = new Font("Helvetica", Font.BOLD, 24);
-		txtAr.setFont(fnt);
+		txtAr.setFont(getFont());
 		JFrame jeff = new JFrame();
 		jeff.add(scrllPn, BorderLayout.CENTER);
 		jeff.setLocation(xCoordinate, yCoordinate);
@@ -125,7 +135,7 @@ public class GUI {
 			}
 		});
 		jeff.add(doneReading, BorderLayout.PAGE_END);
-		jeff.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+		jeff.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE); // won't be blocked by application-modal dialogs
 		jeff.pack();
 		jeff.setSize(frameOutline);
 		jeff.setVisible(true);
@@ -134,13 +144,13 @@ public class GUI {
 	
 	public int giveYesNo (String yesNoQuestion) {
 		yesNoQuestion = tabAndNewlineTranslator(yesNoQuestion);
-		JLabel vessel = new JLabel(yesNoQuestion);
+		JLabel vessel = new JLabel(yesNoQuestion, SwingConstants.CENTER);
 		vessel.setFont(GUIFont);
 		JFrame outputYNFrame = new JFrame();
 		String[] responses = {"Yes", "No", "Quit"};
 		return JOptionPane.showOptionDialog(outputYNFrame,
 											vessel,
-											null,
+											"Y/N/Q",
 											JOptionPane.YES_NO_CANCEL_OPTION,
 											JOptionPane.QUESTION_MESSAGE,
 											UIManager.getIcon("OptionPane.informationIcon"),
@@ -152,9 +162,23 @@ public class GUI {
 		return new OpenURI(destination);
 	}
 	
+	public void setLookAndFeel() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException cnfe) {
+			giveThrowable(cnfe);
+		} catch (IllegalAccessException iae) {
+			giveThrowable(iae);
+		} catch (InstantiationException ie) {
+			giveThrowable(ie);
+		} catch (UnsupportedLookAndFeelException ulafe) {
+			giveThrowable(ulafe);
+		}
+	}
+	
 	public String tabAndNewlineTranslator(String text) { // interprets and changes '\t' and '\n' characters so that their effects will be accurately shown
 		String translatedText = "";
-		if (text.contains("\t")) {
+		if (text.contains("\t")) { // using html for tabs
 			text = text.replaceAll("\t", htmlTab);
 		}
 		if (text.contains("\n")) { // if there are multiple lines in the message
@@ -167,7 +191,7 @@ public class GUI {
 			String[] theLinesOfText = new String[numOfLines];
 			String currentLineOfText = "";
 			int theLinesOfTextCounter = 0;
-			for (int counter = 0; counter < text.length(); counter ++) {
+			for (int counter = 0; counter < text.length(); counter ++) { // filling "theLinesOfText"
 				if (counter < text.length() && text.charAt(counter) != '\n') {
 					currentLineOfText += text.charAt(counter);
 				}
@@ -179,7 +203,7 @@ public class GUI {
 			}
 			theLinesOfText[theLinesOfTextCounter] = currentLineOfText;
 			text = "<html>";
-			for (int counter = 0; counter < theLinesOfText.length; counter ++) {
+			for (int counter = 0; counter < theLinesOfText.length; counter ++) { // using html for newlines
 				theLinesOfText[counter] = theLinesOfText[counter] + "<br\\>";
 				text += theLinesOfText[counter];
 			}

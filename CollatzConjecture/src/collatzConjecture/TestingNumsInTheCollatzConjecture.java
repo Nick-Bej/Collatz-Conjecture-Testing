@@ -124,7 +124,7 @@ class TestingNumsInTheCollatzConjecture {
 					wikipediaLink.addActionListener(gui.linkTo(CCOnWikipedia)); // making it so that upon clicking the URI is opened
 					studyUp.add(wikipediaLink); // adding the button to the JFrame
 				} catch (URISyntaxException urise) {
-					gui.give("Error!\n\n" + urise);
+					gui.giveThrowable(urise);
 				}
 				JButton wolframMathWorldLink = new JButton("What Wolfram MathWorld Has To Say"); // button linking to the Wolfram MathWorld article
 				try {
@@ -132,7 +132,7 @@ class TestingNumsInTheCollatzConjecture {
 					wolframMathWorldLink.addActionListener(gui.linkTo(CCOnWolframMathWorld)); // making it so upon clicking the URI is opened
 					studyUp.add(wolframMathWorldLink); // adding the button to the JFrame
 				} catch (URISyntaxException urise) {
-					gui.give("Error!\n\n" + urise);
+					gui.giveThrowable(urise);
 				}
 				studyUp.pack();
 				int studyUpCenterXCoordinate = studyUp.getWidth() / 2;
@@ -153,8 +153,7 @@ class TestingNumsInTheCollatzConjecture {
 			try {
 				information.join();
 			} catch (InterruptedException ie) {
-				gui.give("Error!\n"
-					   + ie);
+				gui.giveThrowable(ie);
 			}
 		} else if (userAnswer == 2) { // answer was "Quit"
 			System.exit(0);
@@ -196,6 +195,7 @@ class TestingNumsInTheCollatzConjecture {
 					continue;
 				}
 			} catch (NumberFormatException nfe){
+				gui.giveThrowable(nfe);
 				gui.give("Please enter a number!");
 				continue;
 			}
@@ -450,7 +450,7 @@ class TestingNumsInTheCollatzConjecture {
 					numberPair = acquireNumberPair(); // get a new range
 					continue; // move to the beginning of Ultramarine
 				} else if (answer == 1) { // response is "No"
-					JFrame teaRex = gui.giveTextArea(allSequencesAndSuch, 0, 0); // displaying information gathered
+					JFrame teaRex = gui.giveTextArea(allSequencesAndSuch, 0, 0, 1, 3); // displaying information gathered
 					StepsLineGraph.main(floorAndCeilingValues);
 					break Ultramarine;
 				} else if (answer == 2) { // response is "Quit"
@@ -477,6 +477,7 @@ class TestingNumsInTheCollatzConjecture {
 			try {
 				numberPair[0] = Integer.parseInt(str1); // try to convert the user's response into an int
 			} catch (NumberFormatException nfe) { // if the user's response was not a number
+				gui.giveThrowable(nfe);
 				gui.give("Please enter a valid number! (What you entered is not recognized as an integer...)"); // notify them
 				continue; // move to the beginning of the loop
 			}
@@ -499,6 +500,7 @@ class TestingNumsInTheCollatzConjecture {
 			try {
 				numberPair[1] = Integer.parseInt(str2); // try to convert the user's response into an int
 			} catch (NumberFormatException nfe) { // if the user's response was not a number
+				gui.giveThrowable(nfe);
 				gui.give("Please enter a valid number! (What you entered is not recognized as an integer...)"); // notify them
 				continue; // move to the beginning of the loop
 			}
