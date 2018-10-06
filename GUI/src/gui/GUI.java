@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -71,6 +72,15 @@ public class GUI {
 	public GUI (String[] buttons) {
 		JFrame fullscreenFrame = new JFrame();
 		fullscreenFrame.setSize(screensize);
+	}
+	
+	public void center (Component givenComponent) { // makes a given component's location be at the center of the display
+		int componentCenterXCoordinate = givenComponent.getWidth() / 2;
+		int componentCenterYCoordinate = givenComponent.getHeight() / 2;
+		Dimension display = getScreensize();
+		int halfOfDisplayWidth = (int) display.getWidth() / 2;
+		int halfOfDisplayHeight = (int) display.getHeight() / 2;
+		givenComponent.setLocation((halfOfDisplayWidth - componentCenterXCoordinate), (halfOfDisplayHeight - componentCenterYCoordinate));
 	}
 	
 	public int displayOptions (String heading, String[] options) {
@@ -156,6 +166,11 @@ public class GUI {
 											UIManager.getIcon("OptionPane.informationIcon"),
 											responses,
 											responses[responses.length - 1]);
+	}
+	
+	public void goTo (URI destination) {
+		OpenURI target = new OpenURI(destination);
+		target.openURI();
 	}
 	
 	public OpenURI linkTo (URI destination) { // for using the OpenURI class
