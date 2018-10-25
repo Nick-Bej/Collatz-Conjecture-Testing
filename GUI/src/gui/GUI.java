@@ -69,12 +69,12 @@ public class GUI {
 	
 	String htmlTab = "&nbsp;&nbsp;&nbsp;";
 	
-	public GUI (String[] buttons) {
+	public GUI(String[] buttons) {
 		JFrame fullscreenFrame = new JFrame();
 		fullscreenFrame.setSize(screensize);
 	}
 	
-	public void center (Component givenComponent) { // makes a given component's location be at the center of the display
+	public void center(Component givenComponent) { // makes a given component's location be at the center of the display
 		int componentCenterXCoordinate = givenComponent.getWidth() / 2;
 		int componentCenterYCoordinate = givenComponent.getHeight() / 2;
 		Dimension display = getScreensize();
@@ -83,7 +83,7 @@ public class GUI {
 		givenComponent.setLocation((halfOfDisplayWidth - componentCenterXCoordinate), (halfOfDisplayHeight - componentCenterYCoordinate));
 	}
 	
-	public int displayOptions (String heading, String[] options) {
+	public int displayOptions(String heading, String[] options) {
 		JComboBox<String> listOfOptions = new JComboBox<String>(options);
 		listOfOptions.setFont(GUIFont);
 		JFrame displayOptionsFrame = new JFrame();
@@ -91,7 +91,7 @@ public class GUI {
 		return listOfOptions.getSelectedIndex();
 	}
 	
-	public String get (String query) {
+	public String get(String query) {
 		query = tabAndNewlineTranslator(query);
 		JLabel vessel = new JLabel(query, SwingConstants.CENTER);
 		vessel.setFont(GUIFont);
@@ -107,15 +107,32 @@ public class GUI {
 		return screensize;
 	}
 	
-	public void give (String message) {
+	public void give(String message) {
 		message = tabAndNewlineTranslator(message);
 		JLabel vessel = new JLabel(message, SwingConstants.CENTER);
 		vessel.setFont(GUIFont);
 		JFrame outputFrame = new JFrame();
-		JOptionPane.showMessageDialog(outputFrame, vessel, "Message", JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.informationIcon"));
+		String[] button = {"OK"};
+		int choice = JOptionPane.showOptionDialog(outputFrame, vessel, "Message", JOptionPane.INFORMATION_MESSAGE, JOptionPane.INFORMATION_MESSAGE, UIManager.getIcon("OptionPane.informationIcon"), button, button[0]);
+		if (choice == JOptionPane.CLOSED_OPTION) {
+			System.exit(0);
+		}
 	}
 	
-	public void giveThrowable (Throwable gah) {
+	public int giveAndTwoBespokeButtons(String message, String firstButton, String secondButton) {
+		String[] buttons = {firstButton, secondButton};
+		message = tabAndNewlineTranslator(message);
+		JLabel  vessel = new JLabel(message, SwingConstants.CENTER);
+		vessel.setFont(GUIFont);
+		JFrame outputFrame = new JFrame();
+		int choice = JOptionPane.showOptionDialog(outputFrame, vessel, "Message", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, buttons, buttons[0]);
+		if (choice == JOptionPane.CLOSED_OPTION) {
+			System.exit(0);
+		}
+		return choice;
+	}
+	
+	public void giveThrowable(Throwable gah) {
 		String gahDescriptionAndMessage = "Short Description - " + gah.toString() + "\n\n"
 										+ "Detail Message String - " + ((gah.getMessage() != null) ? (gah.getMessage()) : ("(No detail message string)")); // if getMessage() doesn't return null, show its return; else, show custom text
 		gahDescriptionAndMessage = tabAndNewlineTranslator(gahDescriptionAndMessage);
@@ -126,7 +143,7 @@ public class GUI {
 		JOptionPane.showOptionDialog(outputFrame, vessel, "Warning!", JOptionPane.OK_OPTION, JOptionPane.WARNING_MESSAGE, UIManager.getIcon("OptionPane.warningIcon"), option, 0);
 	}
 	
-	public JFrame giveTextArea (String message, int xCoordinate, int yCoordinate, int fractionOfWidth, int fractionOfHeight) {
+	public JFrame giveTextArea(String message, int xCoordinate, int yCoordinate, int fractionOfWidth, int fractionOfHeight) {
 		Dimension frameOutline = new Dimension(getScreensize().width / fractionOfWidth, getScreensize().height / fractionOfHeight); // what fraction of the display should this text area take up
 		JTextArea txtAr = new JTextArea();
 		JScrollPane scrllPn = new JScrollPane(txtAr);
@@ -152,13 +169,13 @@ public class GUI {
 		return jeff;
 	}
 	
-	public int giveYesNo (String yesNoQuestion) {
+	public int giveYesNo(String yesNoQuestion) {
 		yesNoQuestion = tabAndNewlineTranslator(yesNoQuestion);
 		JLabel vessel = new JLabel(yesNoQuestion, SwingConstants.CENTER);
 		vessel.setFont(GUIFont);
 		JFrame outputYNFrame = new JFrame();
 		String[] responses = {"Yes", "No", "Quit"};
-		return JOptionPane.showOptionDialog(outputYNFrame,
+		int choice = JOptionPane.showOptionDialog(outputYNFrame,
 											vessel,
 											"Y/N/Q",
 											JOptionPane.YES_NO_CANCEL_OPTION,
@@ -166,14 +183,18 @@ public class GUI {
 											UIManager.getIcon("OptionPane.informationIcon"),
 											responses,
 											responses[responses.length - 1]);
+		if (choice == JOptionPane.CLOSED_OPTION) {
+			System.exit(0);
+		}
+		return choice;
 	}
 	
-	public void goTo (URI destination) {
+	public void goTo(URI destination) {
 		OpenURI target = new OpenURI(destination);
 		target.openURI();
 	}
 	
-	public OpenURI linkTo (URI destination) { // for using the OpenURI class
+	public OpenURI linkTo(URI destination) { // for using the OpenURI class
 		return new OpenURI(destination);
 	}
 	
